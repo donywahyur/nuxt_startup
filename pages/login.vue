@@ -17,7 +17,7 @@
               type="email"
               class="auth-form focus:outline-none focus:bg-purple-hover focus:shadow-outline focus:border-purple-hover-stroke focus:text-gray-100"
               placeholder="Write your email address here"
-              value="julia.keeva@gmail.com"
+              v-model="form.email"
             />
           </div>
         </div>
@@ -30,14 +30,14 @@
               type="password"
               class="auth-form focus:outline-none focus:bg-purple-hover focus:shadow-outline focus:border-purple-hover-stroke focus:text-gray-100"
               placeholder="Write your password here"
-              value="nasigorenglimaribbu"
+              v-model="form.password"
             />
           </div>
         </div>
         <div class="mb-6">
           <div class="mb-4">
             <button
-              @click="$router.push({ path: '/' })"
+              @click="userLogin"
               class="block w-full bg-orange-button hover:bg-green-button text-white font-semibold px-6 py-4 text-lg rounded-full"
             >
               Sign In
@@ -57,9 +57,25 @@
   </div>
 </template>
 
-<script setup lang="ts">
-//layout
+<script setup>
 definePageMeta({
   layout: "auth",
 });
+
+const form = ref({
+  email: "",
+  password: "",
+});
+const userLogin = async () => {
+  const { login, user } = useAuthUser();
+  const formData = { ...form.value };
+  const { success, error } = await login(formData);
+  console.log(success, error);
+  if (!success) {
+    console.log(error);
+    return;
+  }
+
+  navigateTo("/");
+};
 </script>
