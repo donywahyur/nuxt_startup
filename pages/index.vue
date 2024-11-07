@@ -17,16 +17,14 @@
             </p>
             <button
               @click="$router.push({ path: '/' })"
-              class="block bg-orange-button hover:bg-green-button text-white font-semibold px-12 py-3 text-xl rounded-full"
-            >
+              class="block bg-orange-button hover:bg-green-button text-white font-semibold px-12 py-3 text-xl rounded-full">
               Find a Project
             </button>
           </div>
           <div class="w-1/2 flex justify-center">
             <img
               src="/assets/images/hero-image@2x.png"
-              alt="crowdfunding project"
-            />
+              alt="crowdfunding project" />
           </div>
         </div>
       </div>
@@ -51,8 +49,7 @@
             <img
               src="/assets/images/step-1-illustration.svg"
               alt=""
-              class="h-30 mb-8"
-            />
+              class="h-30 mb-8" />
           </figure>
           <div class="step-content">
             <h3 class="font-medium">Sign Up</h3>
@@ -66,8 +63,7 @@
             <img
               src="/assets/images/step-2-illustration.svg"
               alt=""
-              class="h-30 mb-8"
-            />
+              class="h-30 mb-8" />
           </figure>
           <div class="step-content">
             <h3 class="font-medium">Open Project</h3>
@@ -82,8 +78,7 @@
             <img
               src="/assets/images/step-3-illustration.svg"
               alt=""
-              class="h-30 mb-8"
-            />
+              class="h-30 mb-8" />
           </figure>
           <div class="step-content">
             <h3 class="font-medium">Execute</h3>
@@ -114,8 +109,7 @@
       <div class="grid grid-cols-3 gap-4 mt-3">
         <div
           class="card-project w-full p-5 border border-gray-500 rounded-20"
-          v-for="campaign in campaigns"
-        >
+          v-for="campaign in campaigns">
           <div class="item">
             <figure class="item-image">
               <img
@@ -125,11 +119,10 @@
                     : '/assets/images/no-image.png'
                 "
                 alt=""
-                class="rounded-20 w-full"
-              />
+                class="rounded-20 w-full" />
             </figure>
             <div class="item-meta">
-              <h4 class="text-3xl font-medium text-gray-900 mt-5 h-12">
+              <h4 class="text-xl font-medium text-gray-900 mt-5 h-12">
                 {{ campaign.name }}
               </h4>
               <p class="text-md font-light text-gray-900">
@@ -137,8 +130,7 @@
               </p>
               <div class="relative pt-4 progress-bar">
                 <div
-                  class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 h-3 rounded-lg"
-                >
+                  class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 h-3 rounded-lg">
                   <div
                     :style="
                       'width: ' +
@@ -148,8 +140,7 @@
                       ) +
                       '%'
                     "
-                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-progress progress-striped"
-                  ></div>
+                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-progress progress-striped"></div>
                 </div>
               </div>
               <div class="flex progress-info">
@@ -172,8 +163,7 @@
                   path: '/projects/' + campaign.id,
                 })
               "
-              class="text-center mt-5 button-cta block w-full bg-orange-button hover:bg-green-button text-white font-semibold px-6 py-2 text-lg rounded-full"
-            >
+              class="text-center mt-5 button-cta block w-full bg-orange-button hover:bg-green-button text-white font-semibold px-6 py-2 text-lg rounded-full">
               Fund Now
             </button>
           </div>
@@ -208,25 +198,23 @@
             <img
               src="/assets/images/testimonial-1-icon.png"
               alt=""
-              class="w-20 mr-5 inline-block testimonial-user rounded-full"
-            />
+              class="w-20 mr-5 inline-block testimonial-user rounded-full" />
             <img
               src="/assets/images/testimonial-2-icon.png"
               alt=""
-              class="w-20 mr-5 inline-block testimonial-user rounded-full"
-            />
+              class="w-20 mr-5 inline-block testimonial-user rounded-full" />
             <img
               src="/assets/images/testimonial-3-icon.png"
               alt=""
-              class="w-20 mr-5 inline-block testimonial-user active rounded-full"
-            />
+              class="w-20 mr-5 inline-block testimonial-user active rounded-full" />
           </div>
         </div>
         <div class="w-2/12"></div>
       </div>
     </section>
     <div class="cta-clip -mt-20"></div>
-    <CallToAction />
+    <CallToAction v-if="!user" />
+    <section v-else class="call-to-action bg-purple-progress pt-64 pb-10" />
     <Footer />
   </div>
 </template>
@@ -235,6 +223,8 @@ import Currency from "~/components/Currency.vue";
 
 const config = useRuntimeConfig();
 const baseUrl = config.public.API_BASE_URL;
+const { user, checkUser } = useAuthUser();
+checkUser();
 const { data } = await useFetch(`${baseUrl}api/v1/campaigns`, {
   transform: transformResponse,
 });
