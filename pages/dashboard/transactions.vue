@@ -7,41 +7,34 @@
     </section>
     <section class="container mx-auto pt-8">
       <div class="flex justify-between items-center mb-6">
-        <div class="w-3/4 mr-6">
-          <h2 class="text-4xl text-gray-900 mb-2 font-medium">Dashboard</h2>
-          <ul class="flex mt-2">
-            <li class="mr-6">
-              <NuxtLink
-                class="text-gray-500 hover:text-gray-800"
-                href="/dashboard/index">
-                Your Projects
-              </NuxtLink>
-            </li>
-            <li class="mr-6">
-              <NuxtLink
-                class="text-gray-800 font-bold"
-                href="/dashboard/transactions">
-                Your Transactions
-              </NuxtLink>
-            </li>
-          </ul>
-        </div>
+        <DashboardMenu :menu="'transactions'" />
       </div>
       <hr />
       <div class="block mb-2">
-        <div class="w-full lg:max-w-full lg:flex mb-4">
+        <div v-if="status === 'pending'">Loading</div>
+        <div v-else>
           <div
-            class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
-            style="background-color: #bbb"></div>
-          <div
-            class="w-full border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal">
-            <div>
-              <div class="text-gray-900 font-bold text-xl mb-1">
-                Cari Uang Buat Gunpla
+            class="w-full lg:max-w-full lg:flex mb-4"
+            v-for="transaction in transactions.data">
+            <div
+              v-if="!transaction.campaign.image_url"
+              class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
+              style="background-color: #bbb"></div>
+            <div
+              v-else
+              class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden border border-gray-400"
+              :style="`background-image: url(${baseUrl}${transaction.campaign.image_url})`"></div>
+            <div
+              class="w-full border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal">
+              <div>
+                <div class="text-gray-900 font-bold text-xl mb-1">
+                  {{ transaction.campaign.name }}
+                </div>
+                <p class="text-sm text-gray-600 flex items-center mb-2">
+                  <Currency :number="transaction.amount" /> &middot;
+                  <DateConversion :date="transaction.created_at" />
+                </p>
               </div>
-              <p class="text-sm text-gray-600 flex items-center mb-2">
-                Rp. 200.000.000 &middot; 12 September 2020
-              </p>
             </div>
           </div>
         </div>
@@ -52,3 +45,10 @@
     <Footer />
   </div>
 </template>
+<script setup>
+const baseUrl = useRuntimeConfig().public.API_BASE_URL;
+const { getTransactionUser } = useTransaction();
+const { status, data: transactions } = useLazyAsyncData("transactions", () => {
+  return getTransactionUser();
+});
+</script>

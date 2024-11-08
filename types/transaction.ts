@@ -11,3 +11,16 @@ export interface PaymentTransaction {
   code: string;
   payment_url: string;
 }
+
+export interface Transaction {
+  id: number;
+  amount: number;
+  status: string;
+  created_at: string;
+  campaign: Campaign;
+}
+
+export interface Campaign {
+  name: string;
+  image_url: string;
+}

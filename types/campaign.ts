@@ -8,9 +8,9 @@ export interface Campaign {
   backer_count: number;
   user_id: number;
   slug: string;
-  perks: [string];
-  user: User;
-  Images: [string];
+  perks?: [string];
+  user?: User;
+  Images?: [string];
 }
 
 export interface User {

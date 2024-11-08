@@ -7,23 +7,7 @@
     </section>
     <section class="container mx-auto pt-8">
       <div class="flex justify-between items-center mb-6">
-        <div class="w-3/4 mr-6">
-          <h2 class="text-4xl text-gray-900 mb-2 font-medium">Dashboard</h2>
-          <ul class="flex mt-2">
-            <li class="mr-6">
-              <NuxtLink class="text-gray-800 font-bold" to="#">
-                Your Projects
-              </NuxtLink>
-            </li>
-            <li class="mr-6">
-              <NuxtLink
-                class="text-gray-500 hover:text-gray-800"
-                to="/dashboard/transactions">
-                Your Transactions
-              </NuxtLink>
-            </li>
-          </ul>
-        </div>
+        <DashboardMenu :menu="'dashboard'" />
         <div class="w-1/4 text-right">
           <NuxtLink
             to="/dashboard/create"
@@ -33,27 +17,32 @@
         </div>
       </div>
       <hr />
-      <div class="block mb-2">
-        <div class="w-full lg:max-w-full lg:flex mb-4">
+      <div v-if="status === 'pending'"></div>
+      <div v-else class="block mb-2">
+        <div
+          class="w-full lg:max-w-full lg:flex mb-4"
+          v-for="campaign in campaigns.data">
           <div
-            class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
-            style="
-              background-image: url('https://tailwindcss.com/img/card-left.jpg');
-            "></div>
+            class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden border border-gray-400"
+            :style="`background-image: url(${imageUrl(
+              campaign.image_url
+            )})`"></div>
           <div
-            class="border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal">
+            class="w-full border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal">
             <div class="mb-8">
               <div class="text-gray-900 font-bold text-xl mb-1">
-                Cari Uang Buat Gunpla
+                {{ campaign.name }}
               </div>
               <p class="text-sm text-gray-600 flex items-center mb-2">
-                Rp. 200.000.000 &middot; 80%
+                <Currency :number="campaign.goal_amount" /> &middot;
+                {{
+                  Math.floor(
+                    (campaign.current_amount / campaign.goal_amount) * 100
+                  )
+                }}%
               </p>
               <p class="text-gray-700 text-base">
-                With N-key rollover (NKRO on wired mode only) you can register
-                as many keys as you can press at once without missing out
-                characters. It allows to use all the same media keys as
-                conventional macOS.
+                {{ campaign.short_description }}
               </p>
             </div>
             <div class="flex items-center">
@@ -72,3 +61,22 @@
     <Footer />
   </div>
 </template>
+
+<script setup>
+const baseUrl = useRuntimeConfig().public.API_BASE_URL;
+const { getCampaignUser } = useCampaign();
+const { status, data: campaigns } = useLazyAsyncData("campaigns", () => {
+  return getCampaignUser();
+});
+
+const imageUrl = (image) => {
+  return image ? baseUrl + image : "https://tailwindcss.com/img/card-left.jpg";
+};
+
+if (campaigns.error) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Data Not Found",
+  });
+}
+</script>
