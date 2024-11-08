@@ -17,18 +17,21 @@
                     : '/assets/images/no-image.png'
                 "
                 alt=""
-                class="rounded-20 w-full" />
+                class="rounded-20 w-full"
+              />
             </figure>
           </div>
           <div class="flex -mx-2">
             <div
               v-for="image in campaign.Images"
-              class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded-20">
+              class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded-20"
+            >
               <figure class="item-thumbnail">
                 <img
                   :src="baseUrl + image.image_url"
                   alt=""
-                  class="rounded-20 w-full" />
+                  class="rounded-20 w-full"
+                />
               </figure>
             </div>
           </div>
@@ -36,7 +39,8 @@
         <div class="w-1/4">
           <div
             class="bg-white w-full p-5 border border-gray-400 rounded-20 sticky"
-            style="top: 15px">
+            style="top: 15px"
+          >
             <h3>Project Leader:</h3>
 
             <div class="flex mt-3">
@@ -44,7 +48,8 @@
                 <img
                   src="/assets/images/testimonial-1-icon.png"
                   alt=""
-                  class="w-full inline-block rounded-full" />
+                  class="w-full inline-block rounded-full"
+                />
               </div>
               <div class="w-3/4 ml-5 mt-1">
                 <div class="font-semibold text-xl text-gray-800">
@@ -64,12 +69,22 @@
               type="number"
               class="border border-gray-500 block w-full px-6 py-3 mt-4 rounded-full text-gray-800 transition duration-300 ease-in-out focus:outline-none focus:shadow-outline"
               placeholder="Amount in Rp"
-              value="" />
-            <NuxtLink
-              to="/fund-success"
-              class="text-center mt-3 button-cta block w-full bg-orange-button hover:bg-green-button text-white font-medium px-6 py-3 text-md rounded-full">
+              v-model="form.amount"
+            />
+            <button
+              v-if="user"
+              @click="fundProject"
+              class="text-center mt-3 button-cta block w-full bg-orange-button hover:bg-green-button text-white font-medium px-6 py-3 text-md rounded-full"
+            >
               Fund Now
-            </NuxtLink>
+            </button>
+            <button
+              v-else
+              @click="$router.push({ path: '/login' })"
+              class="text-center mt-3 button-cta block w-full bg-orange-button hover:bg-green-button text-white font-medium px-6 py-3 text-md rounded-full"
+            >
+              Fund Now
+            </button>
           </div>
         </div>
       </div>
@@ -86,10 +101,12 @@
 
           <div class="relative progress-bar">
             <div
-              class="overflow-hidden mb-4 text-xs flex rounded-full bg-gray-200 h-6">
+              class="overflow-hidden mb-4 text-xs flex rounded-full bg-gray-200 h-6"
+            >
               <div
                 :style="'width:' + percentage + '%'"
-                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-progress progress-striped"></div>
+                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-progress progress-striped"
+              ></div>
             </div>
           </div>
           <div class="flex progress-info mb-6">
@@ -116,7 +133,7 @@
 const baseUrl = useRuntimeConfig().public.API_BASE_URL;
 const { user, checkUser } = useAuthUser();
 checkUser();
-const id = parseInt(useRoute().params.id.toString());
+const id = Number.parseInt(useRoute().params.id.toString());
 
 const { getCampaign } = useCampaign();
 const { error, data: campaign } = await getCampaign(id);
@@ -130,4 +147,14 @@ if (error) {
 const percentage = computed(() => {
   return Math.round((campaign.current_amount / campaign.goal_amount) * 100);
 });
+
+const form = ref({
+  amount: 0,
+});
+
+const { createTransaction } = useTransaction();
+const fundProject = async () => {
+  const formData = { ...form.value, campaign_id: id };
+  const resp = await createTransaction(formData);
+};
 </script>

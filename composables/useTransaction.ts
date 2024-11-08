@@ -1,0 +1,40 @@
+import type {
+  CreateTransaction,
+  PaymentTransaction,
+} from "~/types/transaction";
+import { useRuntimeConfig } from "#app";
+
+export function useTransaction() {
+  const baseUrl = useRuntimeConfig().public.API_BASE_URL;
+  const { tokenCookie } = useAuthUser();
+
+  const createTransaction = async (form: CreateTransaction) => {
+    const { data: resp, error } = await useFetch(
+      baseUrl + "api/v1/transactions",
+      {
+        method: "POST",
+        body: form,
+        headers: {
+          Authorization: `Bearer ${tokenCookie.value}`,
+        },
+        transform: transformResponse,
+      }
+    );
+
+    if (error.value) {
+      const data = error.value?.data.data;
+      return {
+        error: data,
+        data: null,
+      };
+    }
+
+    const payment: PaymentTransaction = resp.value?.data;
+    return {
+      data: payment,
+      error: null,
+    };
+  };
+
+  return { createTransaction };
+}

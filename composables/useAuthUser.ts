@@ -158,5 +158,6 @@ export const useAuthUser = () => {
     emailChecker,
     register,
     uploadAvatar,
+    tokenCookie,
   };
 };
