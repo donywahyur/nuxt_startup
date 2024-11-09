@@ -24,3 +24,10 @@ export interface Campaign {
   name: string;
   image_url: string;
 }
+
+export interface CampaignTransaction {
+  id: number;
+  name: string;
+  amount: number;
+  created_at: string;
+}

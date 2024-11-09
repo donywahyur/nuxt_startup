@@ -159,5 +159,6 @@ export const useAuthUser = () => {
     register,
     uploadAvatar,
     tokenCookie,
+    userCookie,
   };
 };

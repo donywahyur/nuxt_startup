@@ -2,57 +2,7 @@
   <div class="project-page">
     <section class="dashboard-header pt-5">
       <div class="container mx-auto relative">
-        <header class="flex items-center">
-          <div style="height: 54px" class="pr-5">
-            <img src="/assets/images/logo.svg" alt="logo" class="h-full" />
-          </div>
-          <ul class="flex items-center">
-            <li>
-              <NuxtLink
-                class="text-white hover:text-teal-500 text-lg px-4 py-3"
-                href="/"
-                >Home</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                class="text-white hover:text-teal-500 text-lg px-4 py-3"
-                href="/pricing"
-                >Project</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                class="text-white hover:text-teal-500 text-lg px-4 py-3"
-                href="/features"
-                >Features</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                class="text-white hover:text-teal-500 text-lg px-4 py-3"
-                href="/story"
-                >Success Stories</NuxtLink
-              >
-            </li>
-          </ul>
-          <ul class="flex ml-auto items-center mt-2">
-            <li>
-              <NuxtLink
-                href="/register"
-                class="inline-block bg-transparent border-white border hover:bg-white hover:bg-opacity-25 text-white font-light w-40 text-center px-6 py-1 text-lg rounded-full mr-4">
-                Sign Up
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink
-                href="/login"
-                class="inline-block bg-transparent border-white border hover:bg-white hover:bg-opacity-25 text-white font-light w-40 text-center px-6 py-1 text-lg rounded-full">
-                My Account
-              </NuxtLink>
-            </li>
-          </ul>
-        </header>
+        <Navbar />
       </div>
     </section>
     <section class="container mx-auto pt-8">
@@ -68,7 +18,8 @@
         <div class="w-1/4 text-right">
           <NuxtLink
             to="/dashboard/projects/create"
-            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center">
+            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center"
+          >
             Edit
           </NuxtLink>
         </div>
@@ -76,7 +27,8 @@
       <div class="block mb-2">
         <div class="w-full lg:max-w-full lg:flex mb-4">
           <div
-            class="border border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal">
+            class="border border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
+          >
             <div>
               <div class="text-gray-900 font-bold text-xl mb-2">
                 Cari Uang Buat Gunpla
@@ -120,46 +72,55 @@
         <div class="w-1/4 text-right">
           <NuxtLink
             href="#"
-            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center">
+            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center"
+          >
             Upload
           </NuxtLink>
         </div>
       </div>
       <div class="flex -mx-2">
         <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded">
+          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
+        >
           <figure class="item-thumbnail">
             <img
               src="/assets/images/project-slider-1.jpg"
               alt=""
-              class="rounded w-full" />
+              class="rounded w-full"
+            />
           </figure>
         </div>
         <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded">
+          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
+        >
           <figure class="item-thumbnail">
             <img
               src="/assets/images/project-slider-2.jpg"
               alt=""
-              class="rounded w-full" />
+              class="rounded w-full"
+            />
           </figure>
         </div>
         <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded">
+          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
+        >
           <figure class="item-thumbnail">
             <img
               src="/assets/images/project-slider-3.jpg"
               alt=""
-              class="rounded w-full" />
+              class="rounded w-full"
+            />
           </figure>
         </div>
         <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded">
+          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
+        >
           <figure class="item-thumbnail">
             <img
               src="/assets/images/project-slider-4.jpg"
               alt=""
-              class="rounded w-full" />
+              class="rounded w-full"
+            />
           </figure>
         </div>
       </div>
@@ -171,7 +132,8 @@
       <div class="block mb-2">
         <div class="w-full lg:max-w-full lg:flex mb-4">
           <div
-            class="w-full border border-gray-400 lg:border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal">
+            class="w-full border border-gray-400 lg:border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
+          >
             <div>
               <div class="text-gray-900 font-bold text-xl mb-1">
                 Galih Pratama
@@ -189,3 +151,16 @@
     <Footer />
   </div>
 </template>
+<script setup>
+const id = Number.parseInt(useRoute().params.id.toString());
+const { getCampaign } = useCampaign();
+const { getCampaignTransaction } = useTransaction();
+const { status, data } = useLazyAsyncData("campaigns", async () => {
+  const [campaign, transaction] = await Promise.all([
+    getCampaign(id),
+    getCampaignTransaction(id),
+  ]);
+  return { campaign, transaction };
+});
+console.log(data);
+</script>

@@ -11,7 +11,8 @@
         <div class="w-1/4 text-right">
           <NuxtLink
             to="/dashboard/create"
-            class="bg-orange-button hover:bg-green-button text-white font-bold py-4 px-4 rounded inline-flex items-center">
+            class="bg-orange-button hover:bg-green-button text-white font-bold py-4 px-4 rounded inline-flex items-center"
+          >
             + Create Campaign
           </NuxtLink>
         </div>
@@ -21,14 +22,15 @@
       <div v-else class="block mb-2">
         <div
           class="w-full lg:max-w-full lg:flex mb-4"
-          v-for="campaign in campaigns.data">
+          v-for="campaign in campaigns.data"
+        >
           <div
             class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden border border-gray-400"
-            :style="`background-image: url(${imageUrl(
-              campaign.image_url
-            )})`"></div>
+            :style="`background-image: url(${imageUrl(campaign.image_url)})`"
+          ></div>
           <div
-            class="w-full border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal">
+            class="w-full border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal"
+          >
             <div class="mb-8">
               <div class="text-gray-900 font-bold text-xl mb-1">
                 {{ campaign.name }}
@@ -47,8 +49,9 @@
             </div>
             <div class="flex items-center">
               <NuxtLink
-                to="/dashboard/detail"
-                class="bg-green-button text-white py-2 px-4 rounded">
+                :to="`/dashboard/projects/${campaign.id}`"
+                class="bg-green-button text-white py-2 px-4 rounded"
+              >
                 Detail
               </NuxtLink>
             </div>

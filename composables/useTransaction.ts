@@ -1,4 +1,5 @@
 import type {
+  CampaignTransaction,
   CreateTransaction,
   PaymentTransaction,
   Transaction,
@@ -63,6 +64,31 @@ export function useTransaction() {
       error: null,
     };
   };
+  const getCampaignTransaction = async (id: number) => {
+    const { data: resp, error } = await useFetch(
+      baseUrl + "api/v1/campaigns/" + id + "/transactions",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${tokenCookie.value}`,
+        },
+        transform: transformResponse,
+      }
+    );
 
-  return { createTransaction, getTransactionUser };
+    if (error.value) {
+      return {
+        error: error.value?.data.data,
+        data: null,
+      };
+    }
+
+    const transaction: [CampaignTransaction] = resp.value?.data;
+    return {
+      data: transaction,
+      error: null,
+    };
+  };
+
+  return { createTransaction, getTransactionUser, getCampaignTransaction };
 }
