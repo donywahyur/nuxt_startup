@@ -5,7 +5,8 @@
         <Navbar />
       </div>
     </section>
-    <section class="container mx-auto pt-8">
+    <Loading v-if="status === 'pending'" />
+    <section class="container mx-auto pt-8" v-else>
       <div class="flex justify-between items-center">
         <div class="w-full mr-6">
           <h2 class="text-4xl text-gray-900 mb-2 font-medium">Dashboard</h2>
@@ -31,36 +32,29 @@
           >
             <div>
               <div class="text-gray-900 font-bold text-xl mb-2">
-                Cari Uang Buat Gunpla
+                {{ data.campaign.data.name }}
               </div>
               <p class="text-sm font-bold flex items-center mb-1">
                 Description
               </p>
               <p class="text-gray-700 text-base">
-                Designed to fit your dedicated typing experience. No matter what
-                you like, linear, clicky or a little in between, we’ve got you
-                covered with three Gateron switches options (Blue, Brown, Red).
-                With a lifespan of 50 million keystroke lifespan we want to make
-                sure that you experience same feedback for every keystroke.
+                {{ data.campaign.data.description }}
               </p>
               <p class="text-gray-700 text-base">
-                With N-key rollover (NKRO on wired mode only) you can register
-                as many keys as you can press at once without missing out
-                characters. It allows to use all the same media keys as
-                conventional macOS.
+                {{ data.campaign.data.short_description }}
               </p>
               <p class="text-sm font-bold flex items-center mb-1 mt-4">
                 What Will Funders Get
               </p>
               <ul class="list-disc ml-5">
-                <li>Equity of the startup directly from the founder</li>
-                <li>Special service or product that startup has</li>
-                <li>
-                  You can also sell your equity once the startup going IPO
+                <li v-for="perk in data.campaign.data.perks">
+                  {{ perk }}
                 </li>
               </ul>
               <p class="text-sm font-bold flex items-center mb-1 mt-4">Price</p>
-              <p class="text-4xl text-gray-700 text-base">200.000</p>
+              <p class="text-4xl text-gray-700 text-base">
+                <Currency :number="data.campaign.data.goal_amount" />
+              </p>
             </div>
           </div>
         </div>
@@ -80,44 +74,12 @@
       </div>
       <div class="flex -mx-2">
         <div
+          v-for="image in data.campaign.data.Images"
           class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
         >
           <figure class="item-thumbnail">
             <img
-              src="/assets/images/project-slider-1.jpg"
-              alt=""
-              class="rounded w-full"
-            />
-          </figure>
-        </div>
-        <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
-        >
-          <figure class="item-thumbnail">
-            <img
-              src="/assets/images/project-slider-2.jpg"
-              alt=""
-              class="rounded w-full"
-            />
-          </figure>
-        </div>
-        <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
-        >
-          <figure class="item-thumbnail">
-            <img
-              src="/assets/images/project-slider-3.jpg"
-              alt=""
-              class="rounded w-full"
-            />
-          </figure>
-        </div>
-        <div
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
-        >
-          <figure class="item-thumbnail">
-            <img
-              src="/assets/images/project-slider-4.jpg"
+              :src="baseUrl + image.image_url"
               alt=""
               class="rounded w-full"
             />
@@ -134,12 +96,13 @@
           <div
             class="w-full border border-gray-400 lg:border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
           >
-            <div>
+            <div v-for="transaction in data.transactions.data">
               <div class="text-gray-900 font-bold text-xl mb-1">
-                Galih Pratama
+                {{ transaction.name }}
               </div>
               <p class="text-sm text-gray-600 flex items-center mb-2">
-                Rp. 200.000 &middot; 12 September 2020
+                <Currency :number="transaction.amount" /> &middot;
+                <DateConversion :date="transaction.created_at" />
               </p>
             </div>
           </div>
@@ -152,14 +115,21 @@
   </div>
 </template>
 <script setup>
+const baseUrl = useRuntimeConfig().public.API_BASE_URL;
 const id = Number.parseInt(useRoute().params.id.toString());
 const { getCampaign } = useCampaign();
 const { getCampaignTransaction } = useTransaction();
-const { status, data } = useLazyAsyncData("campaigns", async () => {
-  const [campaign, transaction] = await Promise.all([
+const { data, status } = await useLazyAsyncData("campaigns", async () => {
+  const [campaign, transactions] = await Promise.all([
     getCampaign(id),
     getCampaignTransaction(id),
   ]);
-  return { campaign, transaction };
+  return { campaign, transactions };
 });
+if (data.value.transactions?.error || data.value.campaign?.error) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Data Not Found",
+  });
+}
 </script>
