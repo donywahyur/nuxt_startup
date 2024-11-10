@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from "#app";
-import type { Campaign } from "~/types/campaign";
+import type { Campaign, CampaignCreate } from "~/types/campaign";
 import type { User } from "~/types/user";
 
 export const useCampaign = () => {
@@ -65,5 +65,28 @@ export const useCampaign = () => {
     };
   };
 
-  return { getCampaign, getCampaignUser };
+  const createCampaign = async (form: CampaignCreate) => {
+    const { data: resp, error } = await useFetch(baseUrl + "api/v1/campaigns", {
+      method: "POST",
+      body: form,
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+      transform: transformResponse,
+    });
+    if (error.value) {
+      const data = error.value?.data.data;
+      return {
+        error: data,
+        data: null,
+      };
+    }
+
+    const campaign: Campaign = resp.value?.data;
+    return {
+      error: null,
+      data: campaign,
+    };
+  };
+  return { getCampaign, getCampaignUser, createCampaign };
 };

@@ -17,3 +17,11 @@ export interface User {
   name: string;
   image_url: string;
 }
+
+export interface CampaignCreate {
+  name: string;
+  short_description: string;
+  description: string;
+  perks: string;
+  goal_amount: number;
+}
