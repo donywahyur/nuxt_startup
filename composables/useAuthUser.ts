@@ -57,7 +57,9 @@ export const useAuthUser = () => {
 
     const data = resp.value?.data;
     user.value = data;
-    userCookie.value = JSON.stringify(data);
+    userCookie.value = data;
+    refreshCookie("tokenCookie");
+    refreshCookie("userCookie");
   };
 
   const checkUser = () => {
@@ -71,6 +73,8 @@ export const useAuthUser = () => {
     tokenCookie.value = null;
     user.value = null;
     userCookie.value = null;
+    refreshCookie("tokenCookie");
+    refreshCookie("userCookie");
   };
   const emailChecker = async (email: string) => {
     const { data: resp, error } = await useFetch(

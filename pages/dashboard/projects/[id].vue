@@ -162,5 +162,4 @@ const { status, data } = useLazyAsyncData("campaigns", async () => {
   ]);
   return { campaign, transaction };
 });
-console.log(data);
 </script>

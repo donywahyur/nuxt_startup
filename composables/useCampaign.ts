@@ -37,8 +37,12 @@ export const useCampaign = () => {
   };
 
   const getCampaignUser = async () => {
+    //get type of userCookie
+    const userData: Ref<User | null> = ref(null);
+    userData.value = JSON.parse(JSON.stringify(userCookie.value));
+
     const { data: resp, error } = await useFetch(
-      baseUrl + "api/v1/campaigns?user_id=",
+      baseUrl + "api/v1/campaigns?user_id=" + userData.value?.id,
       {
         method: "GET",
         headers: {
