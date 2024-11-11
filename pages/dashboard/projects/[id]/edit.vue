@@ -13,7 +13,7 @@
       </div>
       <div class="flex justify-between items-center">
         <div class="w-3/4 mr-6">
-          <h3 class="text-2xl text-gray-900 mb-4">Create New Projects</h3>
+          <h3 class="text-2xl text-gray-900 mb-4">Edit Projects</h3>
         </div>
         <div class="w-1/4 text-right">
           <button
@@ -29,7 +29,8 @@
           <div
             class="w-full border border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
           >
-            <form class="w-full">
+            <div v-if="status === 'pending'"></div>
+            <form v-else class="w-full">
               <div class="flex flex-wrap -mx-3 mb-6">
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                   <label
@@ -115,13 +116,43 @@ const form = ref({
   perks: "",
   goal_amount: 0,
 });
+const id = Number.parseInt(useRoute().params.id.toString());
+
+const { getCampaign } = useCampaign();
+const { data, status, refresh } = await useLazyAsyncData(
+  "campaigns",
+  async () => {
+    return await getCampaign(id);
+  }
+);
+
+watch(
+  [data, status],
+  () => {
+    if (status.value === "success") {
+      if (data.value?.error) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Data Not Found",
+        });
+      }
+      const campaign = data.value.data;
+
+      form.value.name = campaign.name;
+      form.value.short_description = campaign.short_description;
+      form.value.description = campaign.description;
+      form.value.perks = campaign.perks.join(", ");
+      form.value.goal_amount = campaign.goal_amount;
+    }
+  },
+  { immediate: true }
+);
 
 const submit = async () => {
   const formData = { ...form.value };
-  const { createCampaign } = useCampaign();
-  const { data, error } = await createCampaign(formData);
+  const { updateCampaign } = useCampaign();
+  const { error } = await updateCampaign(id, formData);
   if (error) console.log(error);
-
-  navigateTo("/dashboard/projects/" + data.id);
+  refresh();
 };
 </script>

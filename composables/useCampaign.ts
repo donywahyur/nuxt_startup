@@ -116,5 +116,38 @@ export const useCampaign = () => {
       data: campaign,
     };
   };
-  return { getCampaign, getCampaignUser, createCampaign, uploadImageCampaign };
+
+  const updateCampaign = async (id: number, form: CampaignCreate) => {
+    const { data: resp, error } = await useFetch(
+      baseUrl + "api/v1/campaigns/" + id,
+      {
+        method: "PUT",
+        body: form,
+        headers: {
+          Authorization: `Bearer ${tokenCookie.value}`,
+        },
+        transform: transformResponse,
+      }
+    );
+    if (error.value) {
+      const data = error.value?.data.data;
+      return {
+        error: data,
+        data: null,
+      };
+    }
+
+    const campaign: Campaign = resp.value?.data;
+    return {
+      error: null,
+      data: campaign,
+    };
+  };
+  return {
+    getCampaign,
+    getCampaignUser,
+    createCampaign,
+    uploadImageCampaign,
+    updateCampaign,
+  };
 };
