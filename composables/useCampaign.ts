@@ -88,5 +88,33 @@ export const useCampaign = () => {
       data: campaign,
     };
   };
-  return { getCampaign, getCampaignUser, createCampaign };
+
+  const uploadImageCampaign = async (form: FormData) => {
+    const { data: resp, error } = await useFetch(
+      baseUrl + "api/v1/campaign-images",
+      {
+        method: "POST",
+        body: form,
+        headers: {
+          Authorization: `Bearer ${tokenCookie.value}`,
+        },
+        transform: transformResponse,
+      }
+    );
+
+    if (error.value) {
+      const data = error.value?.data.data;
+      return {
+        error: data,
+        data: null,
+      };
+    }
+
+    const campaign: Campaign = resp.value?.data;
+    return {
+      error: null,
+      data: campaign,
+    };
+  };
+  return { getCampaign, getCampaignUser, createCampaign, uploadImageCampaign };
 };

@@ -60,22 +60,23 @@
         </div>
       </div>
       <div class="flex justify-between items-center">
-        <div class="w-3/4 mr-6">
+        <div class="w-1/4 mr-6">
           <h3 class="text-2xl text-gray-900 mb-4 mt-5">Gallery</h3>
         </div>
-        <div class="w-1/4 text-right">
-          <NuxtLink
-            href="#"
+        <div class="w-3/4 text-right">
+          <input type="file" class="border" @change="changeFile" />
+          <button
+            @click="uploadImage"
             class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center"
           >
             Upload
-          </NuxtLink>
+          </button>
         </div>
       </div>
-      <div class="flex -mx-2">
+      <div class="grid grid-cols-4 gap-4 -mx-2">
         <div
           v-for="image in data.campaign.data.Images"
-          class="relative w-1/4 bg-white m-2 p-2 border border-gray-400 rounded"
+          class="relative w-full bg-white m-2 p-2 border border-gray-400 rounded"
         >
           <figure class="item-thumbnail">
             <img
@@ -117,19 +118,42 @@
 <script setup>
 const baseUrl = useRuntimeConfig().public.API_BASE_URL;
 const id = Number.parseInt(useRoute().params.id.toString());
-const { getCampaign } = useCampaign();
+const { getCampaign, uploadImageCampaign } = useCampaign();
 const { getCampaignTransaction } = useTransaction();
-const { data, status } = await useLazyAsyncData("campaigns", async () => {
-  const [campaign, transactions] = await Promise.all([
-    getCampaign(id),
-    getCampaignTransaction(id),
-  ]);
-  return { campaign, transactions };
-});
+const { data, status, refresh } = await useLazyAsyncData(
+  "campaigns",
+  async () => {
+    const [campaign, transactions] = await Promise.all([
+      getCampaign(id),
+      getCampaignTransaction(id),
+    ]);
+    return { campaign, transactions };
+  }
+);
 if (data.value.transactions?.error || data.value.campaign?.error) {
   throw createError({
     statusCode: 404,
     statusMessage: "Data Not Found",
   });
 }
+
+const selectedFile = ref(null);
+const changeFile = (event) => {
+  selectedFile.value = event.target.files[0];
+};
+
+const uploadImage = async () => {
+  const formData = new FormData();
+  formData.append("campaign_id", id);
+  formData.append("file", selectedFile.value);
+  formData.append("is_primary", true);
+  const { error } = await uploadImageCampaign(formData);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  refresh();
+};
 </script>

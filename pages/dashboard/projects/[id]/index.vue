@@ -1,0 +1,159 @@
+<template>
+  <div class="project-page">
+    <section class="dashboard-header pt-5">
+      <div class="container mx-auto relative">
+        <Navbar />
+      </div>
+    </section>
+    <Loading v-if="status === 'pending'" />
+    <section class="container mx-auto pt-8" v-else>
+      <div class="flex justify-between items-center">
+        <div class="w-full mr-6">
+          <h2 class="text-4xl text-gray-900 mb-2 font-medium">Dashboard</h2>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <div class="w-3/4 mr-6">
+          <h3 class="text-2xl text-gray-900 mb-4">Campaign Details</h3>
+        </div>
+        <div class="w-1/4 text-right">
+          <NuxtLink
+            to="/dashboard/projects/create"
+            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center"
+          >
+            Edit
+          </NuxtLink>
+        </div>
+      </div>
+      <div class="block mb-2">
+        <div class="w-full lg:max-w-full lg:flex mb-4">
+          <div
+            class="border border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
+          >
+            <div>
+              <div class="text-gray-900 font-bold text-xl mb-2">
+                {{ data.campaign.data.name }}
+              </div>
+              <p class="text-sm font-bold flex items-center mb-1">
+                Description
+              </p>
+              <p class="text-gray-700 text-base">
+                {{ data.campaign.data.description }}
+              </p>
+              <p class="text-gray-700 text-base">
+                {{ data.campaign.data.short_description }}
+              </p>
+              <p class="text-sm font-bold flex items-center mb-1 mt-4">
+                What Will Funders Get
+              </p>
+              <ul class="list-disc ml-5">
+                <li v-for="perk in data.campaign.data.perks">
+                  {{ perk }}
+                </li>
+              </ul>
+              <p class="text-sm font-bold flex items-center mb-1 mt-4">Price</p>
+              <p class="text-4xl text-gray-700 text-base">
+                <Currency :number="data.campaign.data.goal_amount" />
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <div class="w-1/4 mr-6">
+          <h3 class="text-2xl text-gray-900 mb-4 mt-5">Gallery</h3>
+        </div>
+        <div class="w-3/4 text-right">
+          <input type="file" class="border" @change="changeFile" />
+          <button
+            @click="uploadImage"
+            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center"
+          >
+            Upload
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-4 -mx-2">
+        <div
+          v-for="image in data.campaign.data.Images"
+          class="relative w-full bg-white m-2 p-2 border border-gray-400 rounded"
+        >
+          <figure class="item-thumbnail">
+            <img
+              :src="baseUrl + image.image_url"
+              alt=""
+              class="rounded w-full"
+            />
+          </figure>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <div class="w-3/4 mr-6">
+          <h3 class="text-2xl text-gray-900 mb-4 mt-5">Transaction History</h3>
+        </div>
+      </div>
+      <div class="block mb-2">
+        <div class="w-full lg:max-w-full lg:flex mb-4">
+          <div
+            class="w-full border border-gray-400 lg:border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
+          >
+            <div v-for="transaction in data.transactions.data">
+              <div class="text-gray-900 font-bold text-xl mb-1">
+                {{ transaction.name }}
+              </div>
+              <p class="text-sm text-gray-600 flex items-center mb-2">
+                <Currency :number="transaction.amount" /> &middot;
+                <DateConversion :date="transaction.created_at" />
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="cta-clip -mt-20"></div>
+    <section class="call-to-action bg-purple-progress pt-64 pb-10"></section>
+    <Footer />
+  </div>
+</template>
+<script setup>
+const baseUrl = useRuntimeConfig().public.API_BASE_URL;
+const id = Number.parseInt(useRoute().params.id.toString());
+const { getCampaign, uploadImageCampaign } = useCampaign();
+const { getCampaignTransaction } = useTransaction();
+const { data, status, refresh } = await useLazyAsyncData(
+  "campaigns",
+  async () => {
+    const [campaign, transactions] = await Promise.all([
+      getCampaign(id),
+      getCampaignTransaction(id),
+    ]);
+    return { campaign, transactions };
+  }
+);
+if (data.value.transactions?.error || data.value.campaign?.error) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Data Not Found",
+  });
+}
+
+const selectedFile = ref(null);
+const changeFile = (event) => {
+  selectedFile.value = event.target.files[0];
+};
+
+const uploadImage = async () => {
+  const formData = new FormData();
+  formData.append("campaign_id", id);
+  formData.append("file", selectedFile.value);
+  formData.append("is_primary", true);
+  const { error } = await uploadImageCampaign(formData);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  refresh();
+};
+</script>
