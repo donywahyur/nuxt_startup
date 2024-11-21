@@ -2,7 +2,7 @@
 FROM node:22.11.0-alpine as builder
 
 # Set a flexible working directory
-WORKDIR /home/gonuxt_startup/nuxt_startup
+WORKDIR /app/nuxt-startup
 
 # Install dependencies
 COPY package.json package-lock.json ./
@@ -17,13 +17,13 @@ RUN npm run build
 # Use a minimal Node.js image for the production server
 FROM node:22.11.0-alpine
 
-WORKDIR /home/gonuxt_startup/nuxt_startup
+WORKDIR /app/nuxt-startup
 
 # Copy the build output from the builder stage
-COPY --from=builder /home/gonuxt_startup/nuxt_startup/.output /home/gonuxt_startup/nuxt_startup/.output
+COPY --from=builder /app/nuxt-startup/.output /app/nuxt-startup/.output
 
 # Expose the port Nuxt.js uses (default 3000)
 EXPOSE 3000
 
 # Start the Nuxt.js application
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
