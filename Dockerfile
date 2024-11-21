@@ -26,4 +26,4 @@ COPY --from=builder /root/gonuxt_startup/nuxt_startup/.output /root/gonuxt_start
 EXPOSE 3000
 
 # Start the Nuxt.js application
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
